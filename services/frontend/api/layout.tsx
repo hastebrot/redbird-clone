@@ -23,10 +23,10 @@ export type LayoutProps = {};
 export const Layout = ({}: LayoutProps) => {
   return (
     <Fragment>
-      <div class="font-sans text-[15px] leading-[20px] min-h-screen grid">
+      <div class="font-sans font-[400] text-[14px] leading-[17px] min-h-screen grid">
         <div class="flex flex-row">
           <nav hx-get="/navigation" hx-trigger="load" hx-swap="innerHTML"></nav>
-          {/* <main class="p-4 text-3xl text-red-500 font-semibold">redbird</main> */}
+          <main class="flex-1" hx-get="/content" hx-trigger="load" hx-swap="innerHTML"></main>
         </div>
       </div>
     </Fragment>
