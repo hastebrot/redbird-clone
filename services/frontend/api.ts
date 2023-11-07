@@ -1,4 +1,5 @@
 import { handleGetLayout } from "./api/layout.tsx";
+import { handleGetNavigation } from "./api/navigation.tsx";
 
 const serverTimestamp = Date.now();
 const indexHtml = Deno.readTextFileSync("public/index.html");
@@ -34,6 +35,10 @@ export const apiHandler = async (req: Request): Promise<Response> => {
 
   if (req.method === "GET" && url.pathname === "/layout") {
     return await handleGetLayout(ctx, req);
+  }
+
+  if (req.method === "GET" && url.pathname === "/navigation") {
+    return await handleGetNavigation(ctx, req);
   }
 
   return new Response(null, { status: 404 });

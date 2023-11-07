@@ -7,6 +7,7 @@
     <title>redbird</title>
     <script src="https://unpkg.com/htmx.org@1.9.8" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@twind/cdn@1.0.8" crossorigin="anonymous"></script>
+    <!-- <script src="https://unpkg.com/@unocss/runtime@0.57.2" crossorigin="anonymous"></script> -->
     <script src="/index.hmr.js"></script>
     <script>
       htmx.config.selfRequestsOnly = true;
@@ -16,5 +17,5 @@
       htmx.config.historyCacheSize = 0;
     </script>
   </head>
-  <body hx-get="/layout" hx-trigger="load" hx-swap="innerHTML"></body>
+  <body class="m-0" hx-get="/layout" hx-trigger="load" hx-swap="innerHTML"></body>
 </html>
