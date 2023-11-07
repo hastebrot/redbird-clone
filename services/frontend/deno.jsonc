@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "dev": "deno run -A --unstable --watch=index.html --no-clear-screen service.ts"
+    "dev": "deno run -A --unstable --watch=public/index.html --no-clear-screen service.ts"
   }
 }

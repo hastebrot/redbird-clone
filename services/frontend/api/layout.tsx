@@ -2,8 +2,7 @@
 import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { Fragment, createElement } from "npm:preact@10.18.1";
 import { Log } from "../helper.ts";
-
-type Context = Record<string, unknown>;
+import { Context } from "../types.ts";
 
 // deno-lint-ignore require-await
 export const handleGetLayout = async (ctx: Context, req: Request): Promise<Response> => {
@@ -19,13 +18,16 @@ export const handleGetLayout = async (ctx: Context, req: Request): Promise<Respo
 };
 
 // deno-lint-ignore ban-types
-type LayoutProps = {};
+export type LayoutProps = {};
 
-const Layout = ({}: LayoutProps) => {
+export const Layout = ({}: LayoutProps) => {
   return (
     <Fragment>
-      <div class="p-4 font-sans text-[15px] leading-[20px]">
-        <div class="text-3xl text-red-500 font-semibold">redbird</div>
+      <div class="font-sans text-[15px] leading-[20px] min-h-screen grid">
+        <div class="flex flex-row">
+          <nav hx-get="/navigation" hx-trigger="load" hx-swap="innerHTML"></nav>
+          {/* <main class="p-4 text-3xl text-red-500 font-semibold">redbird</main> */}
+        </div>
       </div>
     </Fragment>
   );
