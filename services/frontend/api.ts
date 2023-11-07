@@ -1,0 +1,40 @@
+import { handleGetLayout } from "./api/layout.tsx";
+
+const serverTimestamp = Date.now();
+const indexHtml = Deno.readTextFileSync("public/index.html");
+const indexHmrJs = Deno.readTextFileSync("public/index.hmr.js");
+
+export const apiHandler = async (req: Request): Promise<Response> => {
+  const url = new URL(req.url);
+  const ctx = {};
+
+  if (req.method === "GET" && url.pathname === "/") {
+    return new Response(indexHtml, {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+      },
+    });
+  }
+
+  if (req.method === "GET" && url.pathname === "/index.hmr.js") {
+    return new Response(indexHmrJs, {
+      headers: {
+        "content-type": "text/javascript; charset=utf-8",
+      },
+    });
+  }
+
+  if (req.method === "GET" && url.pathname === "/hmr") {
+    return new Response(`${serverTimestamp}`, {
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+      },
+    });
+  }
+
+  if (req.method === "GET" && url.pathname === "/layout") {
+    return await handleGetLayout(ctx, req);
+  }
+
+  return new Response(null, { status: 404 });
+};

@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "dev": "deno task dev:frontend",
+    "dev:frontend": "cd services/frontend && PORT=4040 deno task -q dev"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}
