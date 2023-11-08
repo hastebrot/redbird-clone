@@ -25,10 +25,17 @@ export const Navigation = ({}: NavigationProps) => {
           <button class="flex items-center h-8 gap-3 w-full rounded-md border border-slate-300 bg-white pl-3 pr-2 text-slate-400">
             <SearchIcon />
             <span class="text-sm">Search...</span>
+            <div class="ml-auto">
+              <div class="w-fit">
+                <div class="flex h-fit w-full select-none flex-row items-center gap-1 rounded-[6px] py-[3.5px] text-center font-normal px-1 text-xs text-gray-500 bg-gray-100">
+                  <div class="w-fit truncate">⌘K</div>
+                </div>
+              </div>
+            </div>
           </button>
         </div>
-        <div class="flex flex-col w-full gap-1 px-4">
-          <ul class="list-none p-0">
+        <div class="w-full px-4">
+          <ul class="list-none p-0 flex flex-col gap-1">
             <li class="flex flex-row h-8 cursor-pointer items-center gap-3 rounded-md pl-3 pr-2 text-slate-700 hover:bg-zinc-100">
               <SearchIcon />
               <span class="text-sm flex-1">California</span>
