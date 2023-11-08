@@ -1,3 +1,4 @@
+import { handleGetContent } from "./api/content.tsx";
 import { handleGetLayout } from "./api/layout.tsx";
 import { handleGetNavigation } from "./api/navigation.tsx";
 
@@ -39,6 +40,10 @@ export const apiHandler = async (req: Request): Promise<Response> => {
 
   if (req.method === "GET" && url.pathname === "/navigation") {
     return await handleGetNavigation(ctx, req);
+  }
+
+  if (req.method === "GET" && url.pathname === "/content") {
+    return await handleGetContent(ctx, req);
   }
 
   return new Response(null, { status: 404 });
