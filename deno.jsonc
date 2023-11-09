@@ -1,7 +1,13 @@
 {
   "tasks": {
-    "dev": "deno task dev:frontend",
-    "dev:frontend": "cd services/frontend && PORT=4040 deno task -q dev"
+    "dev": "deno task dev:frontend & deno task dev:backend",
+    "dev:frontend": "cd services/frontend && PORT=4040 deno task -q dev",
+    "dev:backend": "cd services/backend && PORT=4041 deno task -q dev",
+    "test": "deno test -A --unstable --no-check testing/",
+    "test:watch": "deno test -A --unstable --no-check --watch testing/"
+  },
+  "test": {
+    "include": ["testing/"]
   },
   "fmt": {
     "lineWidth": 100
