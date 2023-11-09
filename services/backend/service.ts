@@ -23,10 +23,11 @@ if (import.meta.main) {
   addEventListener("beforeunload", async () => {
     await sql.end();
   });
-  await migrateKvStore(sql, postgresSchema);
+  await migrateKvStore(sql, postgresSchema, false);
   const ctx = {
     kv: new KvStore(sql),
   };
+  // console.log(await sql`select count(*) from kv;`)
 
   Deno.serve({
     port: apiPort,

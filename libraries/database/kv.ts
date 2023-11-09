@@ -15,6 +15,7 @@ export class KvStore {
   }
 
   async get<T>({ key }: { key: Key }): Promise<KvResult<T>> {
+    // TODO(benjamin): check if `where key =` uses index.
     return toKvResult(
       await this.sql`
         select key, val, ts from kv
@@ -25,6 +26,7 @@ export class KvStore {
   }
 
   async delete({ key }: { key: Key }): Promise<KvResult<unknown>> {
+    // TODO(benjamin): check if `where key =` uses index.
     return toKvResult(
       await this.sql`
         delete from kv
@@ -91,7 +93,7 @@ export class KvStore {
 
 export async function migrateKvStore(sql: postgres.Sql, schemaName: string, dropSchema = false) {
   if (dropSchema) {
-    await sql`drop schema if exists "${sql.unsafe(schemaName)}";`;
+    await sql`drop schema if exists "${sql.unsafe(schemaName)}" cascade;`;
   }
   await sql`create schema if not exists "${sql.unsafe(schemaName)}";`;
   await sql`set search_path to "${sql.unsafe(schemaName)}";`;
