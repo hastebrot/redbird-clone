@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "kv": "deno run -A --watch --no-clear-screen kv.ts"
+  }
+}
