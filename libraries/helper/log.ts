@@ -1,5 +1,4 @@
-import { format as formatMillis } from "https://deno.land/std@0.205.0/fmt/duration.ts";
-import { format as formatBytes } from "https://deno.land/std@0.205.0/fmt/bytes.ts";
+import { Fmt } from "./fmt.ts";
 
 export const Log = {
   // deno-lint-ignore no-explicit-any
@@ -33,31 +32,5 @@ export const Log = {
       { time: Fmt.millis(end - start) },
       Deno.inspect(data, { depth: 5, colors: true })
     );
-  },
-};
-
-export const Json = {
-  // deno-lint-ignore no-explicit-any
-  write(text: any): string {
-    return JSON.stringify(text);
-  },
-
-  read(text: string): string {
-    return JSON.parse(text);
-  },
-};
-
-export const Fmt = {
-  millis(millis: number, roundTo: "millis" | "micros" = "micros"): string {
-    if (roundTo === "millis") {
-      millis = Math.round(millis);
-    } else if (roundTo === "micros") {
-      millis = Math.round(millis * 1e3) / 1e3;
-    }
-    return millis === 0 ? "0ms" : formatMillis(millis, { ignoreZero: true });
-  },
-
-  bytes(bytes: number): string {
-    return formatBytes(bytes);
   },
 };
