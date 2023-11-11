@@ -3,7 +3,7 @@ import Lucide from "npm:lucide-preact@0.292.0";
 import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { createElement } from "npm:preact@10.18.1";
 import { Log } from "../../../libraries/helper/mod.ts";
-import { Entry } from "../../backend/model.ts";
+import { Document } from "../../backend/model.ts";
 import { classNames } from "../helper.ts";
 import { Context } from "../types.ts";
 
@@ -15,14 +15,14 @@ export const handleGetContent = async (ctx: Context, req: Request): Promise<Resp
   const url = new URL(req.url);
   Log.debug({ url: url.toString(), ctx });
 
-  const res = await fetch("http://localhost:4041/read-entries", {
+  const res = await fetch("http://localhost:4041/read-documents", {
     method: "POST",
     body: JSON.stringify({ authorId: "id-author" }),
     headers,
   });
   const data = await res.json();
 
-  const html = renderToString(<Content entries={data.result.entries} />);
+  const html = renderToString(<Content documents={data.result.documents} />);
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
@@ -31,7 +31,7 @@ export const handleGetContent = async (ctx: Context, req: Request): Promise<Resp
 };
 
 export type ContentProps = {
-  entries: Entry[];
+  documents: Document[];
 };
 
 const TabList = () => {
@@ -67,9 +67,9 @@ export const Content = (props: ContentProps) => {
       <section class="pl-[28px] px-4 pt-3 py-2 border-b border-transparent">
         <div class="flex flex-row justify-between gap-1">
           <div class="flex flex-row items-center">
-            <span class="text-lg font-medium text-slate-600 whitespace-nowrap">Pull requests</span>
+            <span class="text-lg font-medium text-slate-600 whitespace-nowrap">Documents</span>
           </div>
-          <div class="invisible flex flex-row">
+          <div class="hidden flex flex-row">
             <button class="flex items-center justify-center rounded">
               <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
                 Open
@@ -114,7 +114,7 @@ export const Content = (props: ContentProps) => {
             </button>
             <button class="flex flex-row h-8 items-center gap-1 whitespace-nowrap rounded-md bg-blue-600 px-2 text-sm leading-[18px] text-white hover:bg-blue-700 disabled:opacity-50">
               <PlusIcon />
-              <span class="truncate">New pull request</span>
+              <span class="truncate">New document</span>
             </button>
           </div>
         </div>
@@ -125,7 +125,7 @@ export const Content = (props: ContentProps) => {
           <div class="flex flex-row gap-6">
             <button class="py-1 flex items-center justify-center border-b-2 border-blue-600">
               <div class="flex h-8 max-w-[120px] items-center truncate font-semibold text-sm leading-[18px] text-slate-700 hover:text-slate-700">
-                All pull requests
+                All documents
               </div>
             </button>
             <button class="py-1 flex items-center justify-center border-b-2 border-transparent">
@@ -208,8 +208,8 @@ export const Content = (props: ContentProps) => {
       <section class="relative flex-0 h-full overflow-hidden">
         <div class="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-[80px] bg-gradient-to-r from-white/0 to-white/80"></div>
         <TableHeaderRow />
-        {props.entries.map((entry, index) => {
-          return <TableRow entry={entry} index={index} />;
+        {props.documents.map((document, index) => {
+          return <TableRow document={document} index={index} />;
         })}
       </section>
     </div>
@@ -221,22 +221,22 @@ export const TableHeaderRow = () => {
     <div class="h-10 flex border-b border-zinc-200 bg-gray-50">
       <div class="w-[12px] flex items-center justify-center"></div>
       <div class="w-[260px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Title</span>
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Document</span>
       </div>
       <div class="w-[120px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Description</span>
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Label</span>
       </div>
       <div class="w-[120px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Description</span>
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Created on</span>
       </div>
       <div class="w-[200px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Author</span>
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Author name</span>
       </div>
     </div>
   );
 };
 
-export const TableRow = (props: { entry: Entry; index: number }) => {
+export const TableRow = (props: { document: Document; index: number }) => {
   return (
     <div class="relative h-10 flex border-b border-zinc-200">
       <div
@@ -252,7 +252,7 @@ export const TableRow = (props: { entry: Entry; index: number }) => {
       </div>
       <div class="w-[260px] group relative flex items-center px-4">
         <span class="whitespace-nowrap pr-4 text-slate-700 cursor-pointer group-hover:underline">
-          {props.entry.title}
+          {props.document.title}
         </span>
         <TableCellActions />
       </div>
@@ -262,13 +262,15 @@ export const TableRow = (props: { entry: Entry; index: number }) => {
         </div>
       </div>
       <div class="w-[120px] flex items-center px-4">
-        <div class="flex h-6 w-fit max-w-full cursor-default flex-row items-center gap-1 rounded-md border border-slate-300 px-2">
-          <div class="truncate text-sm leading-[18px] text-slate-700">{props.entry.created}</div>
+        <div class="flex h-6 w-fit max-w-full cursor-default flex-row items-center gap-1">
+          <div class="truncate text-sm leading-[18px] text-slate-700">{props.document.created}</div>
         </div>
       </div>
       <div class="w-[200px] group relative px-4 outline-0 hover:bg-gray-100 flex flex-row items-center">
         <div class="flex flex-[1_0_0%] h-6 w-fit max-w-full cursor-default flex-row items-center gap-1 rounded-md border border-slate-300 px-2">
-          <div class="truncate text-sm leading-[18px] text-slate-700">{props.entry.authorId}</div>
+          <div class="truncate text-sm leading-[18px] text-slate-700">
+            {props.document.authorId}
+          </div>
         </div>
         <div class="group-hover:block hidden mx-2">
           <ChevronDownIcon />

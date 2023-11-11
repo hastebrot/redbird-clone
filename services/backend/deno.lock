@@ -16,5 +16,8 @@
       }
     }
   },
-  "remote": {}
+  "remote": {
+    "https://deno.land/std@0.206.0/fmt/bytes.ts": "f29cf69e0791d375f9f5d94ae1f0641e5a03b975f32ddf86d70f70fdf37e7b6a",
+    "https://deno.land/std@0.206.0/fmt/duration.ts": "1dc8d51e85fc566f8fb1bb89b3b252298bd649bec5dd4fdb0f03ac52179ca7ad"
+  }
 }

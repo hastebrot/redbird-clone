@@ -1,4 +1,4 @@
-import { type ZodType, z } from "npm:zod@3.22.4";
+import { z, type ZodType } from "npm:zod@3.22.4";
 
 const describe = <T extends ZodType>(description: string, schema: T): T => {
   return schema.describe(description);
@@ -6,47 +6,48 @@ const describe = <T extends ZodType>(description: string, schema: T): T => {
 
 // ENDPOINT MESSAGES.
 
-export const WriteEntryRequest = describe(
-  "WriteEntryRequest",
-  z.lazy(() => Entry)
+export const WriteDocumentRequest = describe(
+  "WriteDocumentRequest",
+  z.lazy(() => Document)
 );
 
-export const WriteEntryResponse = describe(
-  "WriteEntryResponse",
+export const WriteDocumentResponse = describe(
+  "WriteDocumentResponse",
   z.object({
     ok: z.boolean(),
     id: z.string(),
   })
 );
 
-export const ReadEntriesRequest = describe(
-  "ReadEntriesRequest",
+export const ReadDocumentsRequest = describe(
+  "ReadDocumentsRequest",
   z.object({
     authorId: z.string(),
   })
 );
 
-export const ReadEntriesResponse = describe(
-  "ReadEntriesResponse",
+export const ReadDocumentsResponse = describe(
+  "ReadDocumentsResponse",
   z.object({
     ok: z.boolean(),
     result: z.object({
-      entries: z.array(z.lazy(() => Entry)),
+      documents: z.array(z.lazy(() => Document)),
     }),
     count: z.object({
-      entries: z.number(),
+      documents: z.number(),
     }),
   })
 );
 
 // MESSAGES.
 
-export type Entry = z.infer<typeof Entry>;
-export const Entry = z.object({
+export type Document = z.infer<typeof Document>;
+export const Document = z.object({
   id: z.string().optional(),
   authorId: z.string().optional(),
   title: z.string(),
   description: z.string().optional(),
+  authorName: z.string().optional(),
   created: z.string().optional(),
   lastModified: z.string().optional(),
 });

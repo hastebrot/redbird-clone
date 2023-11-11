@@ -47,7 +47,7 @@ export const Navigation = ({}: NavigationProps) => {
             </li>
             <li class="flex flex-row h-8 cursor-pointer items-center gap-3 rounded-md pl-3 pr-2 text-slate-700 bg-zinc-200 hover:bg-zinc-100">
               <MagicIcon />
-              <span class="text-sm flex-1">Pull requests</span>
+              <span class="text-sm flex-1">Documents</span>
             </li>
           </ul>
         </div>
@@ -61,9 +61,9 @@ export const Navigation = ({}: NavigationProps) => {
   );
 };
 
-export const FreeTrialWell = () => {
+const FreeTrialWell = () => {
   return (
-    <div class="px-4">
+    <div class="hidden px-4">
       <div
         class="flex flex-col gap-4 rounded-lg bg-white p-4"
         style="box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 2px 0px, rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.05) 0px 1px 0px 0px;"
