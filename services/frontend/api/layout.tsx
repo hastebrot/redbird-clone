@@ -1,7 +1,7 @@
 /** @jsx createElement */
 import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { Fragment, createElement } from "npm:preact@10.18.1";
-import { Log } from "../helper.ts";
+import { Log } from "../../../libraries/helper/mod.ts";
 import { Context } from "../types.ts";
 
 // deno-lint-ignore require-await

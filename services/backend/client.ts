@@ -1,42 +1,42 @@
-import { Entry } from "./model.ts";
+import { Document } from "./model.ts";
 import { ClientContext } from "./types.ts";
 
-export const EntryStoreClient = {
-  async writeEntry(ctx: ClientContext, params: Record<string, unknown>) {
+export const DocumentStoreClient = {
+  async writeDocument(ctx: ClientContext, params: Record<string, unknown>) {
     const workspaceKey = toWorkspaceKey(ctx);
-    const entry = transformToEntry(params);
+    const document = transformToDocument(params);
     await ctx.kv.set({
-      key: [...workspaceKey, "entries", entry.id!],
-      val: entry,
+      key: [...workspaceKey, "documents", document.id!],
+      val: document,
     });
-    if (entry.authorId) {
+    if (document.authorId) {
       await ctx.kv.set({
-        key: [...workspaceKey, "entries", entry.id!, "ref-author"],
-        ref: [...workspaceKey, "entries", "by-author", entry.authorId, entry.id!],
-        val: entry,
+        key: [...workspaceKey, "documents", document.id!, "ref-author"],
+        ref: [...workspaceKey, "documents", "by-author", document.authorId, document.id!],
+        val: document,
       });
     } else {
       await ctx.kv.delete({
-        key: [...workspaceKey, "entries", entry.id!, "ref-author"],
+        key: [...workspaceKey, "documents", document.id!, "ref-author"],
       });
     }
-    return { ok: true, id: entry.id! };
+    return { ok: true, id: document.id! };
   },
 
-  async readEntries(ctx: ClientContext, params: Record<string, unknown>) {
+  async readDocuments(ctx: ClientContext, params: Record<string, unknown>) {
     const workspaceKey = toWorkspaceKey(ctx);
-    const entries = await ctx.kv.listRef<Entry>({
-      prefixRef: [...workspaceKey, "entries", "by-author", params.authorId as string],
+    const kvEntries = await ctx.kv.listRef<Document>({
+      prefixRef: [...workspaceKey, "documents", "by-author", params.authorId as string],
       limitBy: 100,
     });
-    const results = [];
-    for (const entry of entries) {
-      results.push(Entry.parse(entry.val));
+    const documents = [];
+    for (const kvEntry of kvEntries) {
+      documents.push(Document.parse(kvEntry.val));
     }
     return {
       ok: true,
-      result: { entries: results },
-      count: { entries: results.length },
+      result: { documents: documents },
+      count: { documents: documents.length },
     };
   },
 };
@@ -45,9 +45,9 @@ const toWorkspaceKey = (ctx: ClientContext): string[] => {
   return [`workspace-${ctx.workspace}`];
 };
 
-const transformToEntry = (record: Record<string, unknown>): Entry => {
+const transformToDocument = (record: Record<string, unknown>): Document => {
   const now = new Date();
-  return Entry.parse({
+  return Document.parse({
     ...record,
     created: record.created ?? now.toISOString(),
     lastModified: now.toISOString(),

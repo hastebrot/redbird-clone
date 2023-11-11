@@ -1,24 +1,27 @@
-import { EntryStoreClient } from "./client.ts";
-import { Json, Parse, throwError } from "./helper.ts";
+import { Fmt, Json, Parse, throwError } from "../../libraries/helper/mod.ts";
+import { DocumentStoreClient } from "./client.ts";
 import {
-  ReadEntriesRequest,
-  ReadEntriesResponse,
-  WriteEntryRequest,
-  WriteEntryResponse,
+  ReadDocumentsRequest,
+  ReadDocumentsResponse,
+  WriteDocumentRequest,
+  WriteDocumentResponse,
 } from "./model.ts";
 import { Context } from "./types.ts";
 
 export const apiHandler = async (ctx: Context, req: Request): Promise<Response> => {
+  const start = performance.now();
   const url = new URL(req.url);
   const clientContext = transformToClientContext(ctx, req.headers);
 
-  if (req.method === "POST" && url.pathname === "/write-entry") {
-    const input = Parse.zod(WriteEntryRequest, await req.json());
+  if (req.method === "POST" && url.pathname === "/write-document") {
+    const input = Parse.zod(WriteDocumentRequest, await req.json());
     const output = Parse.zod(
-      WriteEntryResponse,
-      await EntryStoreClient.writeEntry(clientContext, input)
+      WriteDocumentResponse,
+      await DocumentStoreClient.writeDocument(clientContext, input)
     );
-    return new Response(Json.write(output), {
+    const time = Fmt.millis(performance.now() - start);
+    const size = Fmt.bytes(Json.write(output).length);
+    return new Response(Json.write({ ...output, time, size }), {
       status: 200,
       headers: {
         "content-type": "application/json; charset=utf-8",
@@ -26,13 +29,15 @@ export const apiHandler = async (ctx: Context, req: Request): Promise<Response> 
     });
   }
 
-  if (req.method === "POST" && url.pathname === "/read-entries") {
-    const input = Parse.zod(ReadEntriesRequest, await req.json());
+  if (req.method === "POST" && url.pathname === "/read-documents") {
+    const input = Parse.zod(ReadDocumentsRequest, await req.json());
     const output = Parse.zod(
-      ReadEntriesResponse,
-      await EntryStoreClient.readEntries(clientContext, input)
+      ReadDocumentsResponse,
+      await DocumentStoreClient.readDocuments(clientContext, input)
     );
-    return new Response(Json.write(output), {
+    const time = Fmt.millis(performance.now() - start);
+    const size = Fmt.bytes(Json.write(output).length);
+    return new Response(Json.write({ ...output, time, size }), {
       status: 200,
       headers: {
         "content-type": "application/json; charset=utf-8",

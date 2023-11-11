@@ -1,11 +1,28 @@
 /** @jsx createElement */
+import Lucide from "npm:lucide-preact@0.292.0";
 import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { createElement } from "npm:preact@10.18.1";
+import { Log } from "../../../libraries/helper/mod.ts";
+import { Document } from "../../backend/model.ts";
+import { classNames } from "../helper.ts";
 import { Context } from "../types.ts";
 
-// deno-lint-ignore require-await
-export const handleGetContent = async (_ctx: Context, _req: Request): Promise<Response> => {
-  const html = renderToString(<Content />);
+const headers = {
+  "X-Workspace": "test",
+};
+
+export const handleGetContent = async (ctx: Context, req: Request): Promise<Response> => {
+  const url = new URL(req.url);
+  Log.debug({ url: url.toString(), ctx });
+
+  const res = await fetch("http://localhost:4041/read-documents", {
+    method: "POST",
+    body: JSON.stringify({ authorId: "id-author" }),
+    headers,
+  });
+  const data = await res.json();
+
+  const html = renderToString(<Content documents={data.result.documents} />);
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
@@ -13,40 +30,78 @@ export const handleGetContent = async (_ctx: Context, _req: Request): Promise<Re
   });
 };
 
-// deno-lint-ignore ban-types
-export type ContentProps = {};
+export type ContentProps = {
+  documents: Document[];
+};
 
-export const Content = ({}: ContentProps) => {
+const TabList = () => {
+  return (
+    <div
+      class="[outline:none] w-full items-center justify-center rounded-lg bg-[#F4F4F5] p-0.5 text-[#71717A] flex _grid _grid-cols-2"
+      role="tablist"
+      aria-orientation="horizontal"
+    >
+      <button
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
+        type="button"
+        role="tab"
+        data-state="active"
+      >
+        All (5)
+      </button>
+      <button
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
+        type="button"
+        role="tab"
+        data-state="inactive"
+      >
+        Unread (2)
+      </button>
+    </div>
+  );
+};
+
+export const Content = (props: ContentProps) => {
   return (
     <div class="flex flex-col h-full">
-      <section class="px-4 py-2 border-b border-zinc-200">
+      <section class="pl-[28px] px-4 pt-3 py-2 border-b border-transparent">
         <div class="flex flex-row justify-between gap-1">
-          <div class="flex flex-row">
+          <div class="flex flex-row items-center">
+            <span class="text-lg font-medium text-slate-600 whitespace-nowrap">Documents</span>
+          </div>
+          <div class="hidden flex flex-row">
             <button class="flex items-center justify-center rounded">
-              <div class="flex h-8 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
+              <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
                 Open
               </div>
             </button>
             <button class="flex items-center justify-center rounded">
-              <div class="flex h-8 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 bg-zinc-200 hover:bg-slate-300">
-                Open (Copy)
+              <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 bg-zinc-200 hover:bg-slate-300">
+                <span class="whitespace-nowrap">Open (Copy)</span>
               </div>
             </button>
             <button class="flex items-center justify-center rounded">
-              <div class="flex h-8 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
+              <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
                 Closed
               </div>
             </button>
             <button class="flex items-center justify-center rounded">
-              <div class="flex h-8 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
+              <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
                 All
               </div>
             </button>
             <button class="flex items-center justify-center rounded">
-              <div class="flex h-8 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
+              <div class="flex h-8 gap-1 max-w-[120px] items-center truncated rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
+                <span class="whitespace-nowrap">1 more</span>
+                <ChevronDownIcon />
+              </div>
+            </button>
+            <button class="flex items-center justify-center rounded">
+              <div class="flex h-8 max-w-[120px] items-center truncate rounded-md px-4 text-sm leading-[18px] text-slate-700 hover:bg-slate-300">
                 <PlusIcon />
               </div>
             </button>
+            d
           </div>
           <div class="flex flex-row items-center gap-2">
             <input
@@ -54,29 +109,75 @@ export const Content = ({}: ContentProps) => {
               placeholder="Search..."
             />
             <button class="flex flex-row h-8 items-center gap-1 whitespace-nowrap rounded-md text-slate-500 border border-zinc-200 px-2 text-sm leading-[18px] hover:bg-gray-50 disabled:opacity-50">
-              <DownloadIcon />
+              <ImportIcon />
               <span class="truncate">Import</span>
             </button>
             <button class="flex flex-row h-8 items-center gap-1 whitespace-nowrap rounded-md bg-blue-600 px-2 text-sm leading-[18px] text-white hover:bg-blue-700 disabled:opacity-50">
               <PlusIcon />
-              <span class="truncate">New Entry</span>
+              <span class="truncate">New document</span>
             </button>
           </div>
         </div>
       </section>
 
-      <section class="py-2 pl-2 pr-4 border-b border-zinc-200">
+      <section class="pl-[28px] px-4 border-b border-zinc-200">
+        <div class="flex flex-row justify-between gap-1 -mb-px">
+          <div class="flex flex-row gap-6">
+            <button class="py-1 flex items-center justify-center border-b-2 border-blue-600">
+              <div class="flex h-8 max-w-[120px] items-center truncate font-semibold text-sm leading-[18px] text-slate-700 hover:text-slate-700">
+                All documents
+              </div>
+            </button>
+            <button class="py-1 flex items-center justify-center border-b-2 border-transparent">
+              <div class="flex h-8 max-w-[120px] items-center truncate text-sm leading-[18px] text-slate-500 hover:text-slate-700">
+                Open
+              </div>
+            </button>
+            <button class="py-1 flex items-center justify-center border-b-2 border-transparent">
+              <div class="flex h-8 max-w-[120px] items-center truncate text-sm leading-[18px] text-slate-500 hover:text-slate-700">
+                Closed
+              </div>
+            </button>
+            <button class="py-1 flex items-center justify-center border-b-2 border-transparent">
+              <div class="flex h-8 max-w-[120px] items-center truncate text-sm leading-[18px] text-slate-500 hover:text-slate-700">
+                <span class="whitespace-nowrap">1 more</span>
+                <ChevronDownIcon />
+              </div>
+            </button>
+            <button class="py-1 flex items-center justify-center border-b-2 border-transparent">
+              <div class="flex h-8 max-w-[120px] items-center truncate text-sm leading-[18px] text-slate-500 hover:text-slate-700">
+                <PlusIcon />
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="pl-[20px] py-2 pr-4 border-b border-zinc-200">
         <div class="flex flex-row h-8 justify-between gap-1">
           <div class="flex flex-row items-center gap-1">
-            <div class="px-2 text-sm leading-[18px] text-slate-500">4 items</div>
-            <div class="h-4 w-px flex-shrink-0 bg-zinc-200"></div>
-            <button class="flex items-center justify-center rounded">
+            <div class="flex whitespace-nowrap">
+              <TabList />
+            </div>
+            <div class="hidden px-2 text-sm leading-[18px] text-slate-500">5 items</div>
+            <div class="hidden h-4 w-px flex-shrink-0 bg-zinc-200"></div>
+            <button class="hidden _flex items-center justify-center rounded">
               <div class="group flex flex-row h-8 items-center gap-1 rounded-md px-2 text-slate-700 hover:bg-zinc-200 active:bg-slate-300">
                 <span class="text-sm leading-[18px]">Group</span>
                 <ChevronDownIcon />
               </div>
             </button>
-            <div class="h-4 w-px flex-shrink-0 bg-zinc-200"></div>
+            <div class="hidden h-4 w-px flex-shrink-0 bg-zinc-200"></div>
+            <button class="flex items-center justify-center rounded" type="button">
+              <div class="group flex h-8 flex-row items-center gap-1 rounded-md px-2 text-slate-700 hover:bg-zinc-200 active:bg-slate-300">
+                <div class="text-sm leading-[18px]">Group</div>
+                <div class="flex h-6 flex-row items-center justify-center overflow-hidden rounded-md px-2 text-sm leading-[18px] group-hover:bg-white bg-blue-200 text-blue-800">
+                  <span class="whitespace-nowrap">Label</span>
+                </div>
+                <ChevronDownIcon />
+              </div>
+            </button>
+            <div class="hidden h-4 w-px flex-shrink-0 bg-zinc-200"></div>
             <button class="flex items-center justify-center rounded">
               <div class="group flex flex-row h-8 items-center gap-1 rounded-md px-2 text-slate-700 hover:bg-zinc-200 active:bg-slate-300">
                 <FilterIcon />
@@ -107,9 +208,9 @@ export const Content = ({}: ContentProps) => {
       <section class="relative flex-0 h-full overflow-hidden">
         <div class="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-[80px] bg-gradient-to-r from-white/0 to-white/80"></div>
         <TableHeaderRow />
-        <TableRow />
-        <TableRow />
-        <TableRow />
+        {props.documents.map((document, index) => {
+          return <TableRow document={document} index={index} />;
+        })}
       </section>
     </div>
   );
@@ -117,44 +218,59 @@ export const Content = ({}: ContentProps) => {
 
 export const TableHeaderRow = () => {
   return (
-    <div class="h-10 px-4 flex items-center border-b border-zinc-200 bg-gray-50">
-      <div class="w-[250px]">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Title</span>
+    <div class="h-10 flex border-b border-zinc-200 bg-gray-50">
+      <div class="w-[12px] flex items-center justify-center"></div>
+      <div class="w-[260px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Document</span>
       </div>
-      <div class="w-[150px]">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Description</span>
+      <div class="w-[120px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Label</span>
       </div>
-      <div class="w-[150px]">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Description</span>
+      <div class="w-[120px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Created on</span>
       </div>
-      <div class="w-[200px]">
-        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Author</span>
+      <div class="w-[200px] flex items-center px-4 hover:bg-gray-100 cursor-pointer">
+        <span class="whitespace-nowrap pr-4 text-xs text-slate-600">Author name</span>
       </div>
     </div>
   );
 };
 
-export const TableRow = () => {
+export const TableRow = (props: { document: Document; index: number }) => {
   return (
-    <div class="h-10 px-4 flex items-center border-b border-zinc-200">
-      <div class="w-[250px] group">
+    <div class="relative h-10 flex border-b border-zinc-200">
+      <div
+        class={classNames(
+          props.index % 2 && "invisible",
+          "-z-10 w-[285px] absolute inset-y-0 left-0 flex"
+        )}
+      >
+        <div class="w-full block bg-gradient-to-r from-indigo-50 _via-[#efeeff] to-white"></div>
+      </div>
+      <div class={classNames(props.index % 2 && "invisible", "w-[12px] pl-2.5 flex items-center")}>
+        <div class="flex-shrink-0 rounded-full w-[8px] h-[8px] bg-blue-600"></div>
+      </div>
+      <div class="w-[260px] group relative flex items-center px-4">
         <span class="whitespace-nowrap pr-4 text-slate-700 cursor-pointer group-hover:underline">
-          Lorem ipsum dolor
+          {props.document.title}
         </span>
+        <TableCellActions />
       </div>
-      <div class="w-[150px]">
+      <div class="w-[120px] flex items-center px-4">
         <div class="flex h-6 w-fit max-w-full cursor-default flex-row items-center gap-1 rounded-md border border-slate-300 px-2">
           <div class="truncate text-sm leading-[18px] text-slate-700">Label</div>
         </div>
       </div>
-      <div class="w-[150px]">
-        <div class="flex h-6 w-fit max-w-full cursor-default flex-row items-center gap-1 rounded-md border border-slate-300 px-2">
-          <div class="truncate text-sm leading-[18px] text-slate-700">Label</div>
+      <div class="w-[120px] flex items-center px-4">
+        <div class="flex h-6 w-fit max-w-full cursor-default flex-row items-center gap-1">
+          <div class="truncate text-sm leading-[18px] text-slate-700">{props.document.created}</div>
         </div>
       </div>
-      <div class="w-[200px] h-10 group outline-0 hover:bg-gray-100 flex flex-row items-center">
+      <div class="w-[200px] group relative px-4 outline-0 hover:bg-gray-100 flex flex-row items-center">
         <div class="flex flex-[1_0_0%] h-6 w-fit max-w-full cursor-default flex-row items-center gap-1 rounded-md border border-slate-300 px-2">
-          <div class="truncate text-sm leading-[18px] text-slate-700">Firstname Lastname</div>
+          <div class="truncate text-sm leading-[18px] text-slate-700">
+            {props.document.authorId}
+          </div>
         </div>
         <div class="group-hover:block hidden mx-2">
           <ChevronDownIcon />
@@ -164,101 +280,52 @@ export const TableRow = () => {
   );
 };
 
-export const PlusIcon = () => {
+export const TableCellActions = () => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      aria-hidden="true"
-      class="h-4 w-4"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-    </svg>
+    <div class="absolute bottom-0 right-1 top-0 flex flex-row items-center">
+      <div class="relative flex h-full flex-row items-center gap-1">
+        <div class="invisible group-hover:visible relative flex h-full flex-row items-center gap-1">
+          <button class="flex h-6 flex-row items-center gap-1 rounded-md border border-slate-300 bg-white px-1 text-slate-700 hover:bg-gray-200 active:bg-gray-300">
+            <PanelRightIcon />
+            <div class="text-xs leading-[20px]">Open</div>
+          </button>
+          <button class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border border-slate-300 bg-white hover:bg-gray-200 active:bg-gray-300">
+            <EditIcon />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export const DownloadIcon = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      aria-hidden="true"
-      class="h-4 w-4"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M12 9.75v6.75m0 0l-3-3m3 3l3-3m-8.25 6a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-      ></path>
-    </svg>
-  );
+const ImportIcon = () => {
+  return <Lucide.ArrowUpToLine size={16} strokeWidth={1.6} />;
 };
 
-export const ChevronDownIcon = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      aria-hidden="true"
-      class="h-3 w-3"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-    </svg>
-  );
+const PlusIcon = () => {
+  return <Lucide.Plus size={16} strokeWidth={1.6} />;
 };
 
-export const BoxArrowUpIcon = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M10.667 8L8 5.333m0 0L5.333 8M8 5.333v5.334M5.2 14h5.6c1.12 0 1.68 0 2.108-.218a2 2 0 00.874-.874C14 12.48 14 11.92 14 10.8V5.2c0-1.12 0-1.68-.218-2.108a2 2 0 00-.874-.874C12.48 2 11.92 2 10.8 2H5.2c-1.12 0-1.68 0-2.108.218a2 2 0 00-.874.874C2 3.52 2 4.08 2 5.2v5.6c0 1.12 0 1.68.218 2.108a2 2 0 00.874.874C3.52 14 4.08 14 5.2 14z"
-      ></path>
-    </svg>
-  );
+const ChevronDownIcon = () => {
+  return <Lucide.ChevronDown size={16} strokeWidth={1.6} />;
 };
 
-export const BoxPlusIcon = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-      <path
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M8 5.333v5.334M5.333 8h5.334M5.2 14h5.6c1.12 0 1.68 0 2.108-.218a2 2 0 00.874-.874C14 12.48 14 11.92 14 10.8V5.2c0-1.12 0-1.68-.218-2.108a2 2 0 00-.874-.874C12.48 2 11.92 2 10.8 2H5.2c-1.12 0-1.68 0-2.108.218a2 2 0 00-.874.874C2 3.52 2 4.08 2 5.2v5.6c0 1.12 0 1.68.218 2.108a2 2 0 00.874.874C3.52 14 4.08 14 5.2 14z"
-      ></path>
-    </svg>
-  );
+const FilterIcon = () => {
+  return <Lucide.ListFilter size={16} strokeWidth={1.6} />;
 };
 
-export const FilterIcon = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      class=""
-    >
-      <path
-        d="M4 8H12M2 4H14M6 12H10"
-        stroke="#30374F"
-        stroke-width="1.3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  );
+const BoxArrowUpIcon = () => {
+  return <Lucide.ArrowUpSquare size={16} strokeWidth={1.6} />;
+};
+
+const BoxPlusIcon = () => {
+  return <Lucide.PlusSquare size={16} strokeWidth={1.6} />;
+};
+
+const PanelRightIcon = () => {
+  return <Lucide.PanelRight size={16} strokeWidth={1.6} />;
+};
+
+const EditIcon = () => {
+  return <Lucide.FileEdit size={16} strokeWidth={1.6} />;
 };

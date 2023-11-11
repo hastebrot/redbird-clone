@@ -1,24 +1,45 @@
-import { assertObjectMatch } from "https://deno.land/std@0.205.0/testing/asserts.ts";
+import { assertObjectMatch } from "https://deno.land/std@0.206.0/testing/asserts.ts";
 import { consumeJson, fetchPost } from "../helper.ts";
 
-Deno.test("write entries, read entries by author", async () => {
+Deno.test("write documents, read documents by author", async () => {
   // given:
   await consumeJson(
     fetchPost({
-      url: "http://localhost:4041/write-entry",
-      bodyParams: { id: "id-entry-1", title: "Entry 1", authorId: "id-author" },
+      url: "http://localhost:4041/write-document",
+      bodyParams: {
+        id: "id-document-1",
+        title: "Document 1",
+        authorId: "id-author",
+        authorName: "Author Name",
+      },
     })
   );
   await consumeJson(
     fetchPost({
-      url: "http://localhost:4041/write-entry",
-      bodyParams: { id: "id-entry-2", title: "Entry 2", authorId: "id-author" },
+      url: "http://localhost:4041/write-document",
+      bodyParams: {
+        id: "id-document-2",
+        title: "Document 2",
+        authorId: "id-author",
+        authorName: "Author Name",
+      },
+    })
+  );
+  await consumeJson(
+    fetchPost({
+      url: "http://localhost:4041/write-document",
+      bodyParams: {
+        id: "id-document-3",
+        title: "Document 3",
+        authorId: "id-author",
+        authorName: "Author Name",
+      },
     })
   );
 
   // when:
   const res = await fetchPost({
-    url: "http://localhost:4041/read-entries",
+    url: "http://localhost:4041/read-documents",
     bodyParams: { authorId: "id-author" },
   });
 
@@ -26,17 +47,21 @@ Deno.test("write entries, read entries by author", async () => {
   assertObjectMatch(await consumeJson(res), {
     ok: true,
     result: {
-      entries: [
+      documents: [
         {
-          id: "id-entry-1",
-          title: "Entry 1",
+          id: "id-document-1",
+          title: "Document 1",
         },
         {
-          id: "id-entry-2",
-          title: "Entry 2",
+          id: "id-document-2",
+          title: "Document 2",
+        },
+        {
+          id: "id-document-3",
+          title: "Document 3",
         },
       ],
     },
-    count: { entries: 2 },
+    count: { documents: 3 },
   });
 });
