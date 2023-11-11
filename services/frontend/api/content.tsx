@@ -4,23 +4,14 @@ import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { createElement } from "npm:preact@10.18.1";
 import { Log } from "../../../libraries/helper/mod.ts";
 import { Document } from "../../backend/model.ts";
+import { DocumentClient } from "../client.ts";
 import { classNames } from "../helper.ts";
 import { Context } from "../types.ts";
-
-const headers = {
-  "X-Workspace": "test",
-};
 
 export const handleGetContent = async (ctx: Context, req: Request): Promise<Response> => {
   const url = new URL(req.url);
   Log.debug({ url: url.toString(), ctx });
-
-  const res = await fetch("http://localhost:4041/read-documents", {
-    method: "POST",
-    body: JSON.stringify({ authorId: "id-author" }),
-    headers,
-  });
-  const data = await res.json();
+  const data = await DocumentClient.readDocuments("id-author");
 
   const html = renderToString(<Content documents={data.result.documents} />);
   return new Response(html, {
