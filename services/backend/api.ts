@@ -51,6 +51,6 @@ export const apiHandler = async (ctx: Context, req: Request): Promise<Response> 
 const transformToClientContext = (ctx: Context, headers: Headers) => {
   return {
     kv: ctx.kv,
-    workspace: headers.get("X-Workspace") ?? throwError(`X-Workspace is missing"`),
+    workspace: headers.get("x-workspace") ?? throwError(`x-workspace header is missing"`),
   };
 };

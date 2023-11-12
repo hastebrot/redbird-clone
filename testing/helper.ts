@@ -17,7 +17,11 @@ export const fetchGet = ({ url, urlParams, headers }: FetchGetParams) => {
   const urlWithParams = new URL(url + "?" + new URLSearchParams(urlParams));
   return fetch(urlWithParams, {
     method: "GET",
-    headers: { "X-Workspace": defaultWorkspaceTest, ...headers },
+    headers: {
+      "x-workspace": defaultWorkspaceTest,
+      "cache-control": "no-transform",
+      ...headers,
+    },
   });
 };
 
@@ -26,7 +30,11 @@ export const fetchPost = ({ url, urlParams, bodyParams, headers }: FetchPostPara
   return fetch(urlWithParams, {
     method: "POST",
     body: JSON.stringify(bodyParams),
-    headers: { "X-Workspace": defaultWorkspaceTest, ...headers },
+    headers: {
+      "x-workspace": defaultWorkspaceTest,
+      "cache-control": "no-transform",
+      ...headers,
+    },
   });
 };
 
