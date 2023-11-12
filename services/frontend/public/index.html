@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <meta http-equiv="content-security-policy" content="default-src 'self';" /> -->
     <title>redbird</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta http-equiv="content-security-policy" content="default-src 'self' 'unsafe-inline' unpkg.com;" /> -->
     <script src="https://unpkg.com/htmx.org@1.9.8" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@twind/cdn@1.0.8" crossorigin="anonymous"></script>
     <!-- <script src="https://unpkg.com/@unocss/runtime@0.57.2" crossorigin="anonymous"></script> -->
@@ -13,8 +13,27 @@
       htmx.config.selfRequestsOnly = true;
       htmx.config.ignoreTitle = false;
       htmx.config.allowEval = true;
-      htmx.config.allowScriptTags = true;
+      htmx.config.allowScriptTags = false;
       htmx.config.historyCacheSize = 0;
+
+      htmx.showModal = (event, dialog) => {
+        const button = event.target;
+        if (button) {
+          const buttonRect = button.getBoundingClientRect();
+          const dialogRect = dialog.getBoundingClientRect();
+          const offsetLeft = (dialogRect.width - buttonRect.width) / 2;
+          const offsetTop = 1;
+          dialog.style.left = buttonRect.left + offsetLeft + "px";
+          dialog.style.top = buttonRect.bottom + offsetTop + "px";
+        }
+        dialog.showModal();
+      };
+      htmx.closeModal = (event, dialog) => {
+        const maybeDialog = event.target;
+        if (maybeDialog === dialog) {
+          dialog.close();
+        }
+      };
     </script>
   </head>
   <body class="m-0" hx-get="/layout" hx-trigger="load" hx-swap="innerHTML"></body>

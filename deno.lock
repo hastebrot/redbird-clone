@@ -4,6 +4,7 @@
     "specifiers": {
       "npm:clsx@2.0.0": "npm:clsx@2.0.0",
       "npm:lucide-preact@0.292.0": "npm:lucide-preact@0.292.0_preact@10.18.1",
+      "npm:nanoid@5.0.3": "npm:nanoid@5.0.3",
       "npm:postgres@3.4.3": "npm:postgres@3.4.3",
       "npm:preact-render-to-string@6.2.2": "npm:preact-render-to-string@6.2.2_preact@10.18.1",
       "npm:preact@10.18.1": "npm:preact@10.18.1",
@@ -19,6 +20,10 @@
         "dependencies": {
           "preact": "preact@10.18.1"
         }
+      },
+      "nanoid@5.0.3": {
+        "integrity": "sha512-I7X2b22cxA4LIHXPSqbBCEQSL+1wv8TuoefejsX4HFWyC6jc5JG7CEaxOltiKjc1M+YCS2YkrZZcj4+dytw9GA==",
+        "dependencies": {}
       },
       "postgres@3.4.3": {
         "integrity": "sha512-iHJn4+M9vbTdHSdDzNkC0crHq+1CUdFhx+YqCE+SqWxPjm+Zu63jq7yZborOBF64c8pc58O5uMudyL1FQcHacA==",

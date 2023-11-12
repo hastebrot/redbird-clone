@@ -1,5 +1,6 @@
 /** @jsx createElement */
 import Lucide from "npm:lucide-preact@0.292.0";
+import { nanoid } from "npm:nanoid@5.0.3";
 import { renderToString } from "npm:preact-render-to-string@6.2.2";
 import { createElement } from "npm:preact@10.18.1";
 import { Log } from "../../../libraries/helper/mod.ts";
@@ -25,36 +26,12 @@ export type ContentProps = {
   documents: Document[];
 };
 
-const TabList = () => {
-  return (
-    <div
-      class="[outline:none] w-full items-center justify-center rounded-lg bg-[#F4F4F5] p-0.5 text-[#71717A] flex _grid _grid-cols-2"
-      role="tablist"
-      aria-orientation="horizontal"
-    >
-      <button
-        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
-        type="button"
-        role="tab"
-        data-state="active"
-      >
-        All (5)
-      </button>
-      <button
-        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
-        type="button"
-        role="tab"
-        data-state="inactive"
-      >
-        Unread (2)
-      </button>
-    </div>
-  );
-};
-
 export const Content = (props: ContentProps) => {
   return (
     <div class="flex flex-col h-full">
+      <div class="p-4">
+        <MenuDropdown />
+      </div>
       <section class="pl-[28px] px-4 pt-3 py-2 border-b border-transparent">
         <div class="flex flex-row justify-between gap-1">
           <div class="flex flex-row items-center">
@@ -92,7 +69,6 @@ export const Content = (props: ContentProps) => {
                 <PlusIcon />
               </div>
             </button>
-            d
           </div>
           <div class="flex flex-row items-center gap-2">
             <input
@@ -203,6 +179,83 @@ export const Content = (props: ContentProps) => {
           return <TableRow document={document} index={index} />;
         })}
       </section>
+    </div>
+  );
+};
+
+const MenuDropdown = () => {
+  const idButton = "id-" + nanoid(10);
+  const idDialog = "id-" + nanoid(10);
+
+  return (
+    <div>
+      <menu>
+        <button
+          id={idButton}
+          class="select-none cursor-pointer inline-flex bg-indigo-300 hover:bg-indigo-500 p-2"
+          hx-on:click={`htmx.showModal(event, htmx.find('#${idDialog}'))`}
+        >
+          menu
+        </button>
+      </menu>
+      <dialog
+        id={idDialog}
+        class="backdrop:bg-transparent absolute m-0 p-0 min-w-[100px]"
+        hx-on:click={`htmx.closeModal(event, htmx.find('#${idDialog}'))`}
+        hx-trigger="click"
+        hx-get="/click"
+      >
+        <form class="bg-white border border-black" noValidate>
+          <label class="block p-2 text-slate-500">items</label>
+          <menu>
+            <li
+              class="p-2 cursor-pointer hover:bg-indigo-300"
+              hx-on:click="console.log('clicked item 1')"
+            >
+              item 1
+            </li>
+            <li
+              class="p-2 cursor-pointer hover:bg-indigo-300"
+              hx-on:click="console.log('clicked item 2')"
+            >
+              item 2
+            </li>
+            <li
+              class="p-2 cursor-pointer hover:bg-indigo-300"
+              hx-on:click="console.log('clicked item 3')"
+            >
+              item 3
+            </li>
+          </menu>
+        </form>
+      </dialog>
+    </div>
+  );
+};
+
+const TabList = () => {
+  return (
+    <div
+      class="[outline:none] w-full items-center justify-center rounded-lg bg-[#F4F4F5] p-0.5 text-[#71717A] flex _grid _grid-cols-2"
+      role="tablist"
+      aria-orientation="horizontal"
+    >
+      <button
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
+        type="button"
+        role="tab"
+        data-state="active"
+      >
+        All (5)
+      </button>
+      <button
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1 text-sm _font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#FFFFFF] data-[state=active]:text-[#09090B] data-[state=active]:shadow"
+        type="button"
+        role="tab"
+        data-state="inactive"
+      >
+        Unread (2)
+      </button>
     </div>
   );
 };

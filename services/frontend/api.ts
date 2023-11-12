@@ -14,6 +14,8 @@ export const apiHandler = async (req: Request): Promise<Response> => {
     return new Response(indexHtml, {
       headers: {
         "content-type": "text/html; charset=utf-8",
+        // "cache-control": "no-transform",
+        // "content-security-policy": "default-src 'self';",
       },
     });
   }
